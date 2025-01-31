@@ -1,7 +1,8 @@
-FROM debian:stretch
+FROM alpine
 
-RUN apt-get update
-RUN apt-get install -y tor torsocks iputils-ping
+ARG HASHED_PASSWORD
+
+RUN apk update && apk add tor torsocks iputils-ping
 
 RUN { \
         echo "DNSPort 5300"; \
@@ -9,10 +10,10 @@ RUN { \
         echo "AutomapHostsOnResolve 1"; \
         echo "ControlPort 9051"; \
         echo "CookieAuthentication 1"; \
-        echo "HashedControlPassword CHANGE:IT:WITH:HASH"; \
+        echo "HashedControlPassword ${HASHED_PASSWORD}"; \
     } > /etc/tor/torrc
 
-USER debian-tor
+EXPOSE 9050/tcp
 
 ENTRYPOINT [ \
   "/usr/bin/tor", \
